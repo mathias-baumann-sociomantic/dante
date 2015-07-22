@@ -24,7 +24,7 @@ crontable = []
 outputs = []
 savecounter = 0
 users = {}
-active = deque([], 10)
+active = deque([], 3)
 
 nickname = "dante"
 
