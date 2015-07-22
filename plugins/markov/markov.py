@@ -2,6 +2,11 @@
 
 from collections import deque
 import string, random, sys, os, re, imp
+import sys  
+
+reload(sys)  
+sys.setdefaultencoding('utf8')
+
 cp = imp.find_module('cPickle')
 cPickle = imp.load_module('cPickle', cp[0], cp[1], cp[2])
 
