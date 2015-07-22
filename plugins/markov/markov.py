@@ -2,6 +2,7 @@
 
 from collections import deque
 import string, random, sys, os, re, imp
+from pprint import pprint
 import sys  
 
 reload(sys)  
@@ -36,23 +37,63 @@ def replace_smart(word):
 
     return word
 
+def extractUserName ( nick ):
+    global users
+    stripped = nick.strip("<,:>@").upper()
+
+    for i in users:
+        if i.id == stripped:
+            return i.name
+
+    return nick 
+
+def isName ( name ):
+    nn = extractUserName(name)
+
+    for i in users:
+        if i.name == nn:
+            return True
+
+    return False
+
 #def handle_pubmsg(self, connection, event):
 def process_message(data):
     global users
     global active
-    spoken = 0
     addressed = 0
     directly_addressed = 0
     chainable = 1
+    whonick = ""
+    message = ""
+
+
+    print "================================"
+
     try:
         users = data['users']
-        whonick = next(i for i in users if i.id == data['user']).name
+        if 'user' in data:
+            whonick = next(i for i in users if i.id == data['user']).name
     except:
+        print "stopping."
+        pprint(data)
         return
 
     active.append(whonick)
 
-    message = data['text']; 
+    if 'attachments' in data:
+        if 'text' in data['attachments'][0]:
+            message = data['attachments'][0]['text']
+        else:
+            return
+    elif 'text' in data:
+        message = data['text']; 
+
+    print "input: " +  message
+
+    if len(message) == 0:
+        pprint(data)
+        return
+
     if re.search(string.lower(nickname),
                  string.lower(message)):
         addressed = 1
@@ -71,33 +112,41 @@ def process_message(data):
         input(message)
 
 
-    if not spoken:
-        splitmsg = string.split(message, ' ')
-        try:
-            if len(splitmsg) >= 1 and \
-               string.strip(splitmsg[0], ",:") == nickname:
+    splitmsg = string.split(message, ' ')
+    try:
+        if len(splitmsg) >= 1:
+            stripped = string.strip(splitmsg[0], ",:")
+            if extractUserName(stripped) == nickname:
                splitmsg.pop(0)
-               directly_addressed = 1 
+               directly_addressed = 1
 
-               print "input: " + message
+            text = ""
+
             if len(splitmsg) >= 2:
                 text = string.strip(output(whonick, \
                             replace_smart(replace_name(splitmsg[0])),   \
                             replace_smart(replace_name(splitmsg[1]))))
 
-            tries = 10
+            max_tries = 10
+            tries = 0
 
-            while text == string.join(splitmsg) and tries > 0:
-                print "Found equal, retrying", tries, text
-                text = string.strip(output(whonick, 
-                            replace_smart(replace_name(splitmsg[0])),
-                            replace_smart(replace_name(splitmsg[len(splitmsg)-1]))))
-                print "New: ", text
-                tries = tries - 1
-                if tries == 0:
+            while (text == string.join(splitmsg) or len(text) == 0) \
+                   and tries < max_tries:
+
+                if tries + 1 >= len(splitmsg) or tries+1 == max_tries:
                     text = string.strip(output(whonick))
-        except:
-            text = string.strip(output(whonick))
+                    break
+
+                print "Found equal, retrying", tries, text
+                text = string.strip(output(whonick,
+                            replace_smart(replace_name(splitmsg[tries])),
+                            replace_smart(replace_name(splitmsg[tries+1]))))
+                print "New: ", text
+                tries = tries + 1
+
+    except Exception as inst:
+        print "Exception: " + str(inst)
+        text = string.strip(output(whonick))
 
     if directly_addressed \
         and not text.startswith(".") \
@@ -172,15 +221,13 @@ def replace_mark(word, speaker = NONWORD):
 def replace_name(word):
     stripped = string.lower(string.strip(word, ",:><|?!.()\\/{}[]"))
 
-    print "stripped name: " + stripped
-    print "nickname: " + nickname
-    if stripped == string.lower(nickname):
+    if extractUserName(stripped) == nickname.lower():
         print "myself replaced with mark"
         return TARGET
-    elif stripped in users:
-        print "name, replaced with mark"
+    elif isName(stripped):
+        print "name replaced with mark"
         return OTHER
-        
+    
     return word
 
 def output(speaker, word1=NONWORD, word2=NONWORD):
@@ -188,23 +235,32 @@ def output(speaker, word1=NONWORD, word2=NONWORD):
 
     print "gen output for input " + word1 + word2
 
-    output = replace_mark(word1, speaker) + " " + \
+    text = replace_mark(word1, speaker) + " " + \
              replace_mark(word2, speaker)
 
-    try:
-        for i in range(MAXGEN):
+    for i in range(MAXGEN):
+        if (word1,word2) not in dict:
+            successorList = random.choice(dict.keys())
+        else:
             successorList = dict[(word1,word2)]
-            word3 = random.choice(successorList)
-            if word3 == NONWORD:
-                break
-            output = output + " "  + replace_mark(word3, speaker)
 
-            word1, word2 = word2, word3
-    except:
-        return output(speaker)
-        pass
+        word3 = random.choice(successorList)
+        if word3 == NONWORD:
+            break
 
-    return output
+        print "checking: " + extractUserName(word1) + " " + \
+                             extractUserName(word2)+ " " + \
+                             extractUserName(word3)
+        if isName(word3) or isName(word2) or isName(word1):
+            print "removing (" + word1 + ", " + word2 + ") => " + word3
+            del dict[(word1,word2)]
+            continue
+
+        text = text + " "  + replace_mark(word3, speaker)
+
+        word1, word2 = word2, word3
+
+    return text
 
 def clean_dict ( ):
     for key in dict.keys():
