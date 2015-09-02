@@ -16,7 +16,7 @@ NONWORD = '\n' # Use as start- and endmarkers
 TARGET = '<TARGET>'
 OTHER  = '<OTHER>'
 
-CHATTINESS = 0.02
+CHATTINESS = 0.01
 
 SAVECOUNT = 30
 
