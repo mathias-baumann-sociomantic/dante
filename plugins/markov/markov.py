@@ -123,12 +123,15 @@ def process_message(data):
             text = ""
 
             if len(splitmsg) >= 2:
+                chose = random.randint(1, len(splitmsg)-1)
                 text = string.strip(output(whonick, \
-                            replace_smart(replace_name(splitmsg[0])),   \
-                            replace_smart(replace_name(splitmsg[1]))))
+                            replace_smart(replace_name(splitmsg[chose-1])),   \
+                            replace_smart(replace_name(splitmsg[chose]))))
 
             max_tries = 10
             tries = 0
+
+            text = string.strip(output(whonick))
 
             while (text == string.join(splitmsg) or len(text) == 0) \
                    and tries < max_tries:
