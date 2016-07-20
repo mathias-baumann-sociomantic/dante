@@ -113,6 +113,11 @@ def process_message(data):
         print "Learning"
         input(message)
 
+    print data['channel']
+
+    if data['channel'] != 'G0NKSTBEF':
+        print "Ignoring non #reporting-team-private channel"
+        return
 
     splitmsg = string.split(message, ' ')
     try:
