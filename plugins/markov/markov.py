@@ -73,7 +73,8 @@ def process_message(data):
         users = data['users']
         if 'user' in data:
             whonick = next(i for i in users if i.id == data['user']).name
-    except:
+    except Exception as inst:
+        print "Exception: " + str(inst)
         print "stopping."
         pprint(data)
         return
@@ -99,6 +100,7 @@ def process_message(data):
         addressed = 1
 
     if message == "%s, status?" % nickname:
+        pprint(data)
         outputs.append([data['channel'], "I know %s phrases" %
                            str(len(dict.keys()))])
         return

@@ -19,6 +19,7 @@ def dbg(debug_string):
 
 class RtmBot(object):
     def __init__(self, token):
+        print "Bot object ctor"
         self.last_ping = 0
         self.token = token
         self.bot_plugins = []
@@ -28,6 +29,7 @@ class RtmBot(object):
         self.slack_client = SlackClient(self.token)
         self.slack_client.rtm_connect()
     def start(self):
+        print "starting ourself"
         self.connect()
         self.load_plugins()
         while True:
@@ -68,9 +70,11 @@ class RtmBot(object):
             plugin.do_jobs()
     def load_plugins(self):
         for plugin in glob.glob(directory+'/plugins/*'):
+            print "loading plugin " + plugin
             sys.path.insert(0, plugin)
             sys.path.insert(0, directory+'/plugins/')
         for plugin in glob.glob(directory+'/plugins/*.py') + glob.glob(directory+'/plugins/*/*.py'):
+            print "1loading plugin " + plugin
             logging.info(plugin)
             name = plugin.split('/')[-1][:-3]
 #            try:
