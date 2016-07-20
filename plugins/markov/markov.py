@@ -255,13 +255,14 @@ def output(speaker, word1=NONWORD, word2=NONWORD):
             successorList = dict[(word1,word2)]
 
         word3 = random.choice(successorList)
+
         if word3 == NONWORD:
             break
 
         print "checking: " + extractUserName(word1) + " " + \
                              extractUserName(word2)+ " " + \
                              extractUserName(word3)
-        if isName(word3) or isName(word2) or isName(word1):
+        if isName(word3) or isName(word2) or isName(word1) or word3.startswith("**"):
             print "removing (" + word1 + ", " + word2 + ") => " + word3
             del dict[(word1,word2)]
             continue
