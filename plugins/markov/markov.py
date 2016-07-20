@@ -178,7 +178,7 @@ def strip_shit(message):
             index = index + 1
         else:
             break
-    return string.strip(message[index:])
+    return string.strip(message[index:], " <>")
 
     
 def input(originalText):
@@ -266,7 +266,7 @@ def output(speaker, word1=NONWORD, word2=NONWORD):
             del dict[(word1,word2)]
             continue
 
-        text = text + " "  + replace_mark(word3, speaker)
+        text = text + " "  + string.strip(replace_mark(word3, speaker), "<>")
 
         word1, word2 = word2, word3
 
