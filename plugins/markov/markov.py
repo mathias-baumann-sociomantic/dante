@@ -4,6 +4,7 @@ from collections import deque
 import string, random, sys, os, re, imp
 from pprint import pprint
 import sys  
+import traceback
 
 reload(sys)  
 sys.setdefaultencoding('utf8')
@@ -41,7 +42,7 @@ def extractUserName ( nick ):
     global users
     stripped = nick.strip("<,:>@").upper()
 
-    for i in users:
+    for k, i in users.iteritems():
         if i.id == stripped:
             return i.name
 
@@ -50,7 +51,7 @@ def extractUserName ( nick ):
 def isName ( name ):
     nn = extractUserName(name)
 
-    for i in users:
+    for k, i in users.iteritems():
         if i.name == nn:
             return True
 
@@ -72,9 +73,10 @@ def process_message(data):
     try:
         users = data['users']
         if 'user' in data:
-            whonick = next(i for i in users if i.id == data['user']).name
+            whonick = next(i for k, i in users.iteritems() if i.id == data['user']).name
     except Exception as inst:
         print "Exception: " + str(inst)
+        traceback.print_exc()
         print "stopping."
         pprint(data)
         return
@@ -113,7 +115,7 @@ def process_message(data):
         print "Learning"
         input(message)
 
-    print data['channel']
+#    print data['channel']
 
     if data['channel'] != 'G0NKSTBEF':
         print "Ignoring non #reporting-team-private channel"
@@ -140,27 +142,35 @@ def process_message(data):
 
             text = string.strip(output(whonick))
 
-            while (text == string.join(splitmsg) or len(text) == 0) \
+            while (text == string.join(splitmsg) or \
+                   len(text) == 0 or \
+                   text.find("CRITICAL") > -1 or \
+                   text.find("is OK") > -1 or \
+                   text.find("This pull request has been rebased via") > -1 or \
+                   text.find("://github.com/") > -1) \
                    and tries < max_tries:
 
                 if tries + 1 >= len(splitmsg) or tries+1 == max_tries:
                     text = string.strip(output(whonick))
                     break
 
-                print "Found equal, retrying", tries, text
+                print "Not accepted attempt ", tries, text
                 text = string.strip(output(whonick,
                             replace_smart(replace_name(splitmsg[tries])),
                             replace_smart(replace_name(splitmsg[tries+1]))))
-                print "New: ", text
                 tries = tries + 1
 
+            print "Accepted:", text
+
+
     except Exception as inst:
-        print "Exception: " + str(inst)
+        traceback.print_exc()
+#print "Exception: " + str(inst)
         text = string.strip(output(whonick))
 
     if directly_addressed \
         and not text.startswith(".") \
-        and not text.startswith(whonick) \
+        and text.find(whonick) == -1 \
         and not text.startswith(":") \
         and not whonick == "hugo":
         outputs.append([data['channel'], whonick + ", " + text])
@@ -170,6 +180,11 @@ def process_message(data):
 def strip_nick(message, sender):
     return string.replace(string.strip(message),
                           nickname, sender)
+
+def has_nick(message, nick):
+    return text.find(nick) == -1
+
+
 
 def strip_shit(message):
     index = 0 
@@ -218,12 +233,12 @@ def dumpdb():
 
 def replace_mark(word, speaker = NONWORD):
     if word == TARGET:
-        print "target replaced with", speaker
+#        print "target replaced with", speaker
         return speaker
     elif word == OTHER:
 #        r = "ruport"
         r = active[0]
-        print OTHER + " OTHER replaced with", r
+#        print OTHER + " OTHER replaced with", r
         return r
     else:
         return word
@@ -232,10 +247,10 @@ def replace_name(word):
     stripped = string.lower(string.strip(word, ",:><|?!.()\\/{}[]"))
 
     if extractUserName(stripped) == nickname.lower():
-        print "myself replaced with mark"
+#       print "myself replaced with mark"
         return TARGET
     elif isName(stripped):
-        print "name replaced with mark"
+#print "name replaced with mark"
         return OTHER
     
     return word
@@ -243,7 +258,7 @@ def replace_name(word):
 def output(speaker, word1=NONWORD, word2=NONWORD):
     #word1,word2 = NONWORD, NONWORD # Start at beginning
 
-    print "gen output for input " + word1 + word2
+    print "Gen Output from ", word1, ", ", word2;
 
     text = replace_mark(word1, speaker) + " " + \
              replace_mark(word2, speaker)
@@ -259,10 +274,12 @@ def output(speaker, word1=NONWORD, word2=NONWORD):
         if word3 == NONWORD:
             break
 
-        print "checking: " + extractUserName(word1) + " " + \
-                             extractUserName(word2)+ " " + \
-                             extractUserName(word3)
-        if isName(word3) or isName(word2) or isName(word1) or word3.startswith("**"):
+#        print "checking: " + extractUserName(word1) + " " + \
+#                             extractUserName(word2)+ " " + \
+#                             extractUserName(word3)
+        if isName(word3) or isName(word2) or isName(word1) or \
+           word3.startswith("**") or word1.startswith("CRITICAL"):
+            print "output so far", text;
             print "removing (" + word1 + ", " + word2 + ") => " + word3
             del dict[(word1,word2)]
             continue

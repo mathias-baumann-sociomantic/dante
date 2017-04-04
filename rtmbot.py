@@ -50,6 +50,7 @@ class RtmBot(object):
             function_name = "process_" + data["type"]
             dbg("got {}".format(function_name))
             data['users'] = self.slack_client.server.users
+#print str(self.slack_client.server.users)
             for plugin in self.bot_plugins:
                 plugin.register_jobs()
                 plugin.do(function_name, data)
