@@ -26,6 +26,7 @@ outputs = []
 savecounter = 0
 users = {}
 active = deque([], 3)
+clone_response_counter = 0
 
 nickname = "dante"
 
@@ -61,6 +62,7 @@ def isName ( name ):
 def process_message(data):
     global users
     global active
+    global clone_response_counter
     addressed = 0
     directly_addressed = 0
     chainable = 1
@@ -119,6 +121,15 @@ def process_message(data):
 
     if data['channel'] != 'G0NKSTBEF':
         print "Ignoring non #reporting-team-private channel"
+        return
+
+    if whonick == nickname and addressed:
+        clone_response_counter+=1
+        print "Clone Response Counter at %s" % clone_response_counter
+
+    if clone_response_counter > 5:
+        print "Too much clone talk, ignoring..."
+        clone_response_counter = 0
         return
 
     splitmsg = string.split(message, ' ')
