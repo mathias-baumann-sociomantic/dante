@@ -121,7 +121,7 @@ def process_message(data):
 #message = self.strip_nick(message, whonick)
     message = strip_shit(message)
 
-    if chainable and whonick != "hugo":
+    if chainable and whonick != "hugo" and whonick != nickname:
         print "Learning"
         input(message)
 
