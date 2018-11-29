@@ -113,7 +113,6 @@ def process_message(data):
         addressed = 1
 
     if message == "%s, status?" % nickname:
-        pprint(data)
         outputs.append([data['channel'], "I am %s's and I know %s phrases" %
                            (getpass.getuser(), str(len(dict.keys())))])
         return
