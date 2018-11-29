@@ -29,6 +29,7 @@ active = deque([], 3)
 clone_response_counter = 0
 
 nickname = "dante"
+myid = ""
 
 print "Markov init"
 dict = cPickle.load(open("markov.state", 'r'))
@@ -63,6 +64,7 @@ def process_message(data):
     global users
     global active
     global clone_response_counter
+    global myid
     addressed = 0
     directly_addressed = 0
     chainable = 1
@@ -83,6 +85,11 @@ def process_message(data):
         pprint(data)
         return
 
+    # Find out our own id
+    if users:
+        if len(myid) == 0:
+            myid = next(i for k, i in users.iteritems() if i.name == nickname).id
+
     active.append(whonick)
 
     if 'attachments' in data:
@@ -100,7 +107,8 @@ def process_message(data):
         return
 
     if re.search(string.lower(nickname),
-                 string.lower(message)):
+                 string.lower(message)) or \
+            re.search(myid, message):
         addressed = 1
 
     if message == "%s, status?" % nickname:
