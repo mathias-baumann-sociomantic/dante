@@ -194,14 +194,18 @@ def process_message(data):
 #print "Exception: " + str(inst)
         text = string.strip(output(whonick))
 
+    ts=""
+    if "thread_ts" in data:
+        ts = data['thread_ts']
+
     if directly_addressed \
         and not text.startswith(".") \
         and text.find(whonick) == -1 \
         and not text.startswith(":") \
         and not whonick == "hugo":
-        outputs.append([data['channel'], whonick + ", " + text])
+        outputs.append([data['channel'], whonick + ", " + text, ts])
     elif addressed or random.random() < CHATTINESS:
-        outputs.append([data['channel'], text])
+        outputs.append([data['channel'], text, ts])
 
 def strip_nick(message, sender):
     return string.replace(string.strip(message),
