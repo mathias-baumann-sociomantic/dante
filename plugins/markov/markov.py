@@ -300,7 +300,10 @@ def output(speaker, word1=NONWORD, word2=NONWORD):
            word3.startswith("**") or word1.startswith("CRITICAL"):
             print "output so far", text;
             print "removing (" + word1 + ", " + word2 + ") => " + word3
-            del dict[(word1,word2)]
+            try:
+                del dict[(word1,word2)]
+            except:
+                pass
             continue
 
         text = text + " "  + string.strip(replace_mark(word3, speaker), "<>")
