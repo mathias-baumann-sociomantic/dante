@@ -5,6 +5,7 @@ import string, random, sys, os, re, imp
 from pprint import pprint
 import sys  
 import traceback
+import getpass
 
 reload(sys)  
 sys.setdefaultencoding('utf8')
@@ -113,8 +114,8 @@ def process_message(data):
 
     if message == "%s, status?" % nickname:
         pprint(data)
-        outputs.append([data['channel'], "I know %s phrases" %
-                           str(len(dict.keys()))])
+        outputs.append([data['channel'], "I am %s's and I know %s phrases" %
+                           (getpass.getuser(), str(len(dict.keys())))])
         return
 
 
