@@ -117,6 +117,8 @@ def process_message(data):
                            (getpass.getuser(), str(len(dict.keys())))])
         return
 
+    if message == "%s, repo?" % nickname:
+        outputs.append([data['channel'], "Find me at https://github.com/mathias-baumann-sociomantic/dante"])
 
 #message = self.strip_nick(message, whonick)
     message = strip_shit(message)
