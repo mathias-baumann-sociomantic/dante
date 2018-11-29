@@ -125,10 +125,8 @@ def process_message(data):
         print "Learning"
         input(message)
 
-#    print data['channel']
-
-    if data['channel'] != 'G0NKSTBEF':
-        print "Ignoring non #reporting-team-private channel"
+    if data['channel'] != 'G8N3A55BK':
+        print "Ignoring this channel (%s)" % data['channel']
         return
 
     if whonick == nickname and addressed:
