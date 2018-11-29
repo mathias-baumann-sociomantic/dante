@@ -35,12 +35,6 @@ myid = ""
 print "Markov init"
 dict = cPickle.load(open("markov.state", 'r'))
 
-def replace_smart(word):
-#if string.lower(word) == "who":
-#       return OTHER
-
-    return word
-
 def extractUserName ( nick ):
     global users
     stripped = nick.strip("<,:>@").upper()
@@ -68,7 +62,6 @@ def process_message(data):
     global myid
     addressed = 0
     directly_addressed = 0
-    chainable = 1
     whonick = ""
     message = ""
     direct_message = data['channel'].startswith("D")
@@ -123,7 +116,7 @@ def process_message(data):
 #message = self.strip_nick(message, whonick)
     message = strip_shit(message)
 
-    if chainable and whonick != "hugo" and whonick != nickname:
+    if whonick != "roterabe_bot" and whonick != nickname:
         print "Learning"
         input(message)
 
@@ -156,8 +149,8 @@ def process_message(data):
             if len(splitmsg) >= 2:
                 chose = random.randint(1, len(splitmsg)-1)
                 text = string.strip(output(whonick, \
-                            replace_smart(replace_name(splitmsg[chose-1])),   \
-                            replace_smart(replace_name(splitmsg[chose]))))
+                            replace_name(splitmsg[chose-1]),   \
+                            replace_name(splitmsg[chose])))
 
             max_tries = 10
             tries = 0
@@ -178,8 +171,8 @@ def process_message(data):
 
                 print "Not accepted attempt ", tries, text
                 text = string.strip(output(whonick,
-                            replace_smart(replace_name(splitmsg[tries])),
-                            replace_smart(replace_name(splitmsg[tries+1]))))
+                            replace_name(splitmsg[tries]),
+                            replace_name(splitmsg[tries+1])))
                 tries = tries + 1
 
             print "Accepted:", text
