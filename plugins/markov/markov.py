@@ -256,7 +256,7 @@ def replace_mark(word, speaker = NONWORD):
         return speaker
     elif word == OTHER:
 #        r = "ruport"
-        r = active[0]
+        r = active[-1]
 #        print OTHER + " OTHER replaced with", r
         return r
     else:
