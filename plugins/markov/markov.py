@@ -105,10 +105,9 @@ def process_message(data):
     elif 'text' in data:
         message = data['text']; 
 
-    print "input: " +  message
+    print "input: '%s'" % message
 
     if len(message) == 0:
-        pprint(data)
         return
 
     if re.search(string.lower(nickname),
