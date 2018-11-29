@@ -92,6 +92,9 @@ def process_message(data):
         if len(myid) == 0:
             myid = next(i for k, i in users.iteritems() if i.name == nickname).id
 
+    if 'bot_id' in data:
+        return
+
     active.append(whonick)
 
     if 'attachments' in data:
