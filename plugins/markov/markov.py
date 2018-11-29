@@ -71,6 +71,7 @@ def process_message(data):
     chainable = 1
     whonick = ""
     message = ""
+    direct_message = data['channel'].startswith("D")
 
 
     print "================================"
@@ -127,7 +128,10 @@ def process_message(data):
         print "Learning"
         input(message)
 
-    if data['channel'] != 'G8N3A55BK':
+    if whonick != nickname and direct_message:
+        addressed = 1
+
+    if not direct_message and data['channel'] != 'G8N3A55BK':
         print "Ignoring this channel (%s)" % data['channel']
         return
 
