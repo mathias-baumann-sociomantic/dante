@@ -303,6 +303,7 @@ def output(speaker, word1=NONWORD, word2=NONWORD):
             try:
                 del dict[(word1,word2)]
             except:
+                print "Failed to remove pair ('%s', '%s')" % (word1, word2)
                 pass
             continue
 
